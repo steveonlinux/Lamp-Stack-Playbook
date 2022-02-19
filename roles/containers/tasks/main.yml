@@ -1,0 +1,27 @@
+---
+
+- name: apache container
+  community.docker.docker_container:
+    image: httpd:latest
+    name: apache
+    #state: started
+    # devices: <path_on_host>:<path_in_container>:<cgroup_permissions>
+    volumes: /srv/html/:/usr/local/apache2/htdocs/[:ro]
+    ports:
+    - "8080:80"
+- name: mysql container
+  community.docker.docker_container:
+    image: mysql:latest
+    name: mysql
+    env:
+      MYSQL_ROOT_PASSWORD: "password1"
+    detach: true
+
+- name: jenkins container
+  community.docker.docker_container:
+    image: jenkins/jenkins:lts-jdk11
+    name: jenkins
+    ports:
+      - "50000:50000"
+      - "8080:8080"
+    volumes: /srv/jenkins_home:/var/jenkins_home/[:ro]

@@ -1,0 +1,12 @@
+---
+
+- name: install and enable docker on all nodes
+  hosts: all
+  become: true
+  become_user: root
+  ignore_errors: true
+
+  roles: 
+    - common
+    - containers
+ 

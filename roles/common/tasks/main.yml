@@ -1,0 +1,42 @@
+---
+
+- name: docker_apt
+  apt_block:
+    - name: Add Docker GPG apt Key
+      apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+    - name: Install Docker
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: yes
+        name: docker-ce,docker-ce-cli
+        state: latest
+  when: (ansible_facts['distribution'] == "Debian") or
+        (ansible_facts['distribution'] == "Ubuntu")
+        
+- name: docker_rpm
+  dnf_block:
+    - name: set up dnf
+      ansible.builtin.dnf:
+        name: dnf-plugins-core
+        state: latest
+    - name: add repo
+      ansible.builtin.yum_repository:
+        baseurl: https://download.docker.com/linux/fedora/docker-ce.repo
+    - name: install docker engine
+      ansible.builtin.dnf:
+        name: docker-ce,docker-ce-cli,containerd.io
+  when: (ansible_facts['distribution'] == "Fedora") or
+        (ansible_facts['distribution'] == "Rocky") or
+        (ansible_facts['distribution'] == "CentOS")
+  
+- name: enable docker daemon
+  ansible.builtin.systemd: 
+    name: docker
+    state: started
+    enabled: yes
